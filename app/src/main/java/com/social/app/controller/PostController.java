@@ -314,6 +314,22 @@ public class PostController {
         }
         return responseConvertService.postResponseArrayList(findResult);
     }
+    @GetMapping("/find-post/{groupId}")
+    public ArrayList<PostResponse> findPostGroup(@PathVariable Long groupId,@RequestParam("findContent") String findContent){
+        ArrayList<Post> allPostGroup = postServices.retriveGroupPostFromDB(groupId);
+        ArrayList<Post> findResultGroup = new ArrayList<>();
+        if(findContent!= null && findContent != "\s") {
+            for (Post p : allPostGroup) {
+                if (p.getTitles()!= null && p.getTitles().toLowerCase().contains(findContent.toLowerCase().trim())) {
+                    findResultGroup.add(p);
+                }
+            }
+        }else {
+            return null;
+        }
+        return responseConvertService.postResponseArrayList(findResultGroup);
+    }
+
 
 
 
