@@ -1,5 +1,6 @@
 package com.social.app.controller;
 
+import com.social.app.dto.PostReportDTO;
 import com.social.app.entity.PostResponse;
 import com.social.app.entity.ResponseObject;
 import com.social.app.model.*;
@@ -53,10 +54,12 @@ public class PostController {
     @PostMapping("/posting")
     public ResponseEntity<ResponseObject> submitPost(@RequestPart Post body,
                                                      @RequestParam(value = "file", required = false) MultipartFile[] file,
-                                                     @RequestParam("userid") int userid,
+//                                                     @RequestParam("userid") int userid,
                                                      @RequestParam("groupid") int groupid){
         // Check if user is not in group, user can not dislike post
-        if(!userService.isGroupMember(userid, groupid))
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        int userid = userService.findUserByUsername(authentication.getName()).getUserId();
+        if(!userService.isGroupMember(groupid))
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("Failed","User must be in group","")
             );
@@ -74,6 +77,8 @@ public class PostController {
                             imagePath=imagePath + FOLDER_PATH + fileName+" ";
                         }
                         body.setImageURL(imagePath.trim());
+                    }else {
+                        body.setImageURL("");
                     }
                     postServices.submitPostToDB(body);
                     return ResponseEntity.status(HttpStatus.OK).body(
@@ -92,26 +97,22 @@ public class PostController {
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
     @PutMapping("/editpost")
     public ResponseEntity<ResponseObject>  updateUser(@RequestPart Post postData,
-                                                      @RequestParam("userid") int userid,
+//                                                      @RequestParam("userid") int userid,
                                                       @RequestParam("postid") long postid,
                                                       //nhap vao vi tri anh can xoa. Example: anh thu 1 va 2 => imageRemove[1,2]
                                                       @RequestParam(value="imageRemove",required = false)int[] imageRemove,
                                                       //thêm ảnh nếu cần
                                                       @RequestParam(value = "file", required = false) MultipartFile[] file){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        int userid = userService.findUserByUsername(authentication.getName()).getUserId();
         try {
             boolean check = false;
 
             if (postServices.loadPostById(postid).getUser().getUserId() == userid) {
                 postData.setPostId(postid);
-
                 String arr[] = postServices.loadPostById(postid).getImageURL().trim().replaceAll("\\s+", " ").split(" ");
-
-
-
                 ArrayList<String> imagesArraylist = new ArrayList<String>(Arrays.asList(arr));
-
                 String newImageList="";
-
                 if(imageRemove!= null){
                     for(int index:imageRemove){
                         if(index>=arr.length)
@@ -169,7 +170,9 @@ public class PostController {
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
     @DeleteMapping("/deletepost/{postId}")
     public  ResponseEntity<ResponseObject> deleteParticularPost(@PathVariable("postId")long postId){
-        if(postServices.loadPostById(postId)!=null){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        int userid = userService.findUserByUsername(authentication.getName()).getUserId();
+        if(postServices.loadPostById(postId)!=null && postServices.loadPostById(postId).getUser().getUserName().matches(authentication.getName())){
             postServices.deletePostDB(postId);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("OK","Delete Succesfully","")
@@ -190,7 +193,7 @@ public class PostController {
 
         Post post = postServices.loadPostById(postId);
         // Check if user is not in group, user can not dislike post
-        if(!userService.isGroupMember(userId, post.getGroup().getGroupId()))
+        if(!userService.isGroupMember(post.getGroup().getGroupId()))
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("Failed","User must be in group","")
             );
@@ -221,7 +224,7 @@ public class PostController {
 
         Post post = postServices.loadPostById(postId);
         // Check if user is not in group, user can not like post
-        if(!userService.isGroupMember(userId, post.getGroup().getGroupId()))
+        if(!userService.isGroupMember(post.getGroup().getGroupId()))
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("Failed","User must be in group","")
             );
@@ -271,7 +274,7 @@ public class PostController {
 
         Post post = postServices.loadPostById(postId);
         // Check if user is not in group, user can not report post
-        if(!userService.isGroupMember(userId, post.getGroup().getGroupId()))
+        if(!userService.isGroupMember(post.getGroup().getGroupId()))
             return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                     new ResponseObject("Failed","User must be in group","")
             );
@@ -290,8 +293,13 @@ public class PostController {
     }
 
     @GetMapping("/all-reports/{postId}")
-    public ArrayList<PostReport> getAllPostReports(@PathVariable long postId){
-        return reportService.getAllPostReports(postId);
+    public ArrayList<PostReport> getAllReportsByPostId(@PathVariable long postId){
+        return reportService.getAllPostReportsByPostId(postId);
+    }
+
+    @GetMapping("/all-reports")
+    public ArrayList<PostReportDTO> getAllReports(){
+        return reportService.getAllPostReports();
     }
 
     @GetMapping("/all-report-types")

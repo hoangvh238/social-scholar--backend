@@ -3,13 +3,12 @@ package com.social.app.controller;
 import com.social.app.entity.PostResponse;
 import com.social.app.entity.ResponseObject;
 import com.social.app.model.Groups;
+import com.social.app.model.JoinManagement;
 import com.social.app.model.Post;
 import com.social.app.model.User;
+import com.social.app.repository.JoinRepository;
 import com.social.app.repository.UserRepository;
-import com.social.app.service.GroupServices;
-import com.social.app.service.ImageStorageService;
-import com.social.app.service.UserInfoDetails;
-import com.social.app.service.UserService;
+import com.social.app.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +35,8 @@ public class GroupController {
     UserService userService;
     @Autowired
     ImageStorageService imageStorageService;
+    @Autowired
+    JoinService joinService;
     private final String FOLDER_PATH="D:\\New folder\\upload\\";
 
 
@@ -147,6 +148,17 @@ public class GroupController {
             return null;
         }
         return findResult;
+    }
+    @GetMapping("/join-group/{groupId}")
+    public  ResponseEntity<ResponseObject> joinGroup(@PathVariable Long groupId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+                if(userService.isGroupMember(groupId) || groupServices.isGroupHost(groupId)){
+                    return   ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseObject("User Joined Group", "ERROR",null));
+                }
+
+                  return   ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Join Success", "OK",joinService.saveJoin(new JoinManagement(groupServices.loadGroupById(groupId), userService.findUserByUsername(username), Calendar.getInstance().getTime()))));
     }
 
 

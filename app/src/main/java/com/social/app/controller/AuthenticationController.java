@@ -41,7 +41,7 @@ public class AuthenticationController {
     @PostMapping("/sign-up")
     public ResponseEntity<ResponseObject> register(@RequestBody User userInfo) {
         System.out.println(userInfo);
-       if(service.isExits(userInfo)) return  ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseObject("User had been exits", "ERROR",null));
+       if(service.isExits(userInfo)) return   ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseObject("User had been exits", "ERROR",null));
        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject("Register success", "OK",service.addUser(userInfo)));
     }
     @GetMapping("/profile")

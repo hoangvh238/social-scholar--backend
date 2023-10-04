@@ -50,7 +50,7 @@ public class JwtService {
         claims.put("email", passwordReset.getEmail());
 
 
-        return createToken(claims, passwordReset.getEmail());
+        return createTokenOTP(claims, passwordReset.getEmail());
     }
 
     //email

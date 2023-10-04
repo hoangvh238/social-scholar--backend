@@ -12,4 +12,7 @@ import java.util.ArrayList;
 public interface JoinRepository extends JpaRepository<JoinManagement, Long> {
     ArrayList<JoinManagement> findByGroup(Groups group);
     ArrayList<JoinManagement> findByUser(User user);
+
+    JoinManagement save(JoinManagement joinManagement);
+
 }

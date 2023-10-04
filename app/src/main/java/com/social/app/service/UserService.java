@@ -5,6 +5,8 @@ import com.social.app.repository.GroupRepository;
 import com.social.app.repository.JoinRepository;
 import com.social.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -106,6 +108,11 @@ public class UserService implements UserDetailsService {
         } else throw new RuntimeException("Did not find employee id - " + id);
         return theUser;
     }
+
+    public User loadUserByUserName(String userName){
+        User user = repository.findByUserName(userName).orElseThrow(()-> new RuntimeException("User does not exist!"));
+        return user;
+    }
     public Boolean existPhone(String phone){
         Optional<User> result = repository.findByUserName(phone);
         return result.isPresent();
@@ -199,9 +206,11 @@ public class UserService implements UserDetailsService {
         return repository.save(user);
     }
 
-    public boolean isGroupMember(int userId, long groupId){
-        // Get user by userId
-        User user = loadUserById(userId);
+    public boolean isGroupMember(long groupId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user =  findUserByUsername(username);
         // Get list joinmanagement by user
         ArrayList<JoinManagement> joins = joinRepository.findByUser(user);
         for (JoinManagement join:joins) {
@@ -215,5 +224,12 @@ public class UserService implements UserDetailsService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new RuntimeException("Not found comment"));
         if (userId == comment.getUser().getUserId()) return true;
         return false;
+    }
+
+    public User findUserByUsername(String username){
+        return repository.findUserByUserName(username);
+    }
+    public ArrayList<User> findAll(){
+        return repository.findAll();
     }
 }
