@@ -6,5 +6,7 @@ public class Views {
     public static class PostReportView{}
     public static class CommentLikeView{}
     public static class PostLikeView{}
-    public static class PostView{}
+    public static class UserView {}
+
+    public static class PostView {}
 }
