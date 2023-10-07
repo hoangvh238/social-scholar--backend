@@ -362,7 +362,7 @@ public class PostController {
             post.getUser().setCoin(post.getUser().getCoin()+coins);
             userService.save(post.getUser());
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("OK","Donate successfully","")
+                    new ResponseObject("OK","Donate success","")
             );
         }
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
