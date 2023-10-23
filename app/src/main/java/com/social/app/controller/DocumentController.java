@@ -374,7 +374,7 @@ public class DocumentController {
             doc.setMessage(message);
             documentService.update(doc);
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("Successfull", "Done", ""));
+                    new ResponseObject("Successfully", "Done", ""));
         }
     }
 }
