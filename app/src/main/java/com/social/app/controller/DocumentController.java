@@ -262,6 +262,7 @@ public class DocumentController {
                 return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
                         new ResponseObject("The document has already been approved", "failed", ""));
             document.setApproved(true);
+            document.setMessage("Accepted");
             documentService.update(document);
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ResponseObject("ok", "Update successfully", "Approved"));
@@ -359,4 +360,21 @@ public class DocumentController {
                 new ResponseObject("Rate document successfully", "OK", ratingDTO));
     }
 
+    @PostMapping("/rejected/{docId}")
+    public ResponseEntity<ResponseObject> rejectDocument(@PathVariable Long docId,@RequestParam String message){
+        Document doc = documentService.findDocumentbyId(docId);
+        if(doc==null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("The document is not exist", "failed", ""));
+        }else{
+            if (doc.isApproved()) {
+                return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(
+                        new ResponseObject("The document has already been approved", "failed", ""));
+            }
+            doc.setMessage(message);
+            documentService.update(doc);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ResponseObject("Successfull", "Done", ""));
+        }
+    }
 }
