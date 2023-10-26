@@ -4,9 +4,12 @@ import com.social.app.dto.GroupDTO;
 import com.social.app.dto.UserDTO;
 import com.social.app.entity.ResponseObject;
 import com.social.app.entity.UserResponse;
+import com.social.app.model.Bill;
 import com.social.app.model.Groups;
 import com.social.app.model.JoinManagement;
 import com.social.app.model.User;
+import com.social.app.repository.BillRepository;
+import com.social.app.service.BillService;
 import com.social.app.service.GroupServices;
 import com.social.app.service.ResponseConvertService;
 import com.social.app.service.UserService;
@@ -25,6 +28,9 @@ public class AdminController {
     UserService userService;
     @Autowired
     ResponseConvertService responseConvertService;
+
+    @Autowired
+    BillService billService;
     @Autowired
     GroupServices groupServices;
     @GetMapping("/getalluser")
@@ -54,5 +60,15 @@ public class AdminController {
                     new ResponseObject("Empty", "No User found", ""));
         }else  return ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("OK", "Count Success", result));
+    }
+
+    @GetMapping("/getAllBill")
+    public ResponseEntity<ResponseObject> getAllBill(){
+        ArrayList<Bill> result = billService.allBuill();
+        if(result== null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    new ResponseObject("Empty", "No Bill found", ""));
+        }else  return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("OK", "Get all bill done", billService.ArrayListPostDTO(result)));
     }
 }
