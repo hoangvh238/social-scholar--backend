@@ -20,6 +20,7 @@ public class BillDTO {
     private Timestamp times;
     private Document document;
     private User user;
+    private double price;
 
     @JsonView(Views.BillView.class)
     public long getBillId() {
@@ -38,6 +39,11 @@ public class BillDTO {
     @JsonView(Views.BillView.class)
     public int getUser() {
         return user.getUserId();
+    }
+
+    @JsonView(Views.BillView.class)
+    public long getPrice() {
+        return document.getCost();
     }
 
 }

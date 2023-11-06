@@ -3,6 +3,7 @@ package com.social.app.controller;
 import com.social.app.entity.ResponseObject;
 import com.social.app.model.User;
 import com.social.app.service.ImageStorageService;
+import com.social.app.service.UserSalerReportServices;
 import com.social.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -35,6 +36,9 @@ public class ProfileController {
 
     @Autowired
     ImageStorageService imageStorageService;
+
+    @Autowired
+    UserSalerReportServices userSalerReportServices;
 
     private final String FOLDER_PATH="F:\\CampSchoolar\\uploads\\";
     @PostMapping("/{username}")
@@ -181,6 +185,14 @@ public class ProfileController {
         System.out.println("data la"+authentication.getName());
         User theUser = service.findUserByUsername(authentication.getName());
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject( "Successful", "OK",theUser.getCoin()));
+    }
+
+    @GetMapping("/get-sale-report")
+    @PreAuthorize("isAuthenticated() and hasAuthority('ROLE_USER')")
+    public ResponseEntity<ResponseObject> getSaleReport(@RequestParam("userid") int userid){
+        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //User theUser = service.findUserByUsername(authentication.getName());
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject( "Successful", "OK",userSalerReportServices.saleReport(userid)));
     }
 
 }

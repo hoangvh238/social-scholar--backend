@@ -11,10 +11,11 @@ public interface DocumentRepository extends JpaRepository<Document,Long> {
     Document save(Document document);
     ArrayList<Document> findAllByIsApprovedIsTrue();
     ArrayList<Document> findAllByIsApprovedIsFalse();
+
     ArrayList<Document> findByAuthorAndIsApprovedIsTrue(User user);
     ArrayList<Document> findByGroupAndIsApprovedIsTrue(Groups groups);
 
      Document findByDocumentId(long documentId);
      void deleteById(long id);
-
+     ArrayList<Document> findAllByAuthor(User author);
 }
