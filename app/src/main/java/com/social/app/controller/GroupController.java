@@ -53,7 +53,7 @@ public class GroupController {
            User user =  userService.findUser(username).orElse(null);
            Groups newGroup = new Groups();
 //them ngay tạo
-            if(user.getActivityPoint() >= 2000){
+            if(user.getActivityPoint() >= 0){
                 //set ava group
 
 //                if (fileGAvatar!=null) {
