@@ -18,6 +18,7 @@ public class CorsConfig {
         config.addAllowedOrigin("https://camp-scholar.vercel.app");
         config.addAllowedOrigin("https://new-gules-seven.vercel.app");
         config.addAllowedOrigin("https://www.sandbox.paypal.com");
+        config.addAllowedOrigin("https://camp-scholar-frontend.vercel.app");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
